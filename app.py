@@ -8,6 +8,7 @@ import logging
 import authentication_util
 import model_util
 import sbh_util
+import html_creator as hc
 import matplotlib.pyplot as plt
 import uuid
 import sbol2
@@ -127,13 +128,13 @@ def run():
 #pass items from array into img src
 
             #TODO call websockets to plot
-        html_file = f"""<!doctype html>
-                                	<html>
-                                	<body>
-                                	<img src="flapjack_plot.jpg" alt="success">
-                                	</body>
-                                	</html>
-                                	"""
+
+        # Plot creation
+        signal_names = ['GFP', 'RFP', 'YFP', 'CFP']
+        signal_graphs = ['<div>GFP</div>', '<div>RFP</div>', '<div>YFP</div>', '<div>CFP</div>']
+        all_graph = "<div>Original</div>"
+        html_file = hc.html_creator(signal_names, signal_graphs, all_graph)
+
             #html_output = authentication_util.plot(figname)
         return html_file
         # TODO error handling -- if authentiation fails and or any of the calls fail, we need graceful handling
@@ -144,19 +145,3 @@ def run():
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         lnum = exc_tb.tb_lineno
         abort(400, f'Exception is: {e}, exc_type: {exc_type}, exc_obj: {exc_obj}, fname: {fname}, line_number: {lnum}, traceback: {traceback.format_exc()}')
-
-
-@app.route("/public/<file_name>")
-def success(file_name):
-    cwd = os.getcwd()
-    try:
-        path = os.path.join(cwd)
-        return flask.send_from_directory(path, file_name)
-    except:
-        with open(os.path.join(cwd, "Static_File_Not_Found.html")) as file:
-            error_message = file.read()
-
-        error_message = error_message.replace('REPLACE_FILENAME', path)
-        return error_message, 404
-
-app.run(debug=False)

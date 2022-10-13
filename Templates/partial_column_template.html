@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+/* Create two equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 50%;
+  padding: 10px;
+  height: 300px; /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+</style>
+</head>
+<body>
+
+<div class="row">
+  <div class="column">
+	<h2>Selection 1</h2>
+	<select type="text" id="dropBox1" onchange="changeSelect()">
+		<option value="1">All</option>{{drop_down_options}}
+	</select>
+	<p></p>
+	<div id="divText1">{{all_graph}}</div>
+  </div>
+  <div class="column">
+    <h2>Selection 2</h2>
+	<select type="text" id="dropBox2" onchange="changeSelect2()">
+		<option value="1">All</option>{{drop_down_options}}
+	</select>
+	<p></p>
+    <div id="divText2">{{all_graph}}</div>
+	</div>
+  </div>
+</div>
+
+<script>
+function changeSelect() {
+    if (document.getElementById("dropBox1").value == "1") {
+        document.getElementById("divText1").innerHTML = '{{all_graph}}';
+    }{{func1_options}}
+}
+
+function changeSelect2() {
+    if (document.getElementById("dropBox2").value == "1") {
+        document.getElementById("divText2").innerHTML = '{{all_graph}}';
+    }{{func2_options}}
+}
+</script>
+
+</body>
+</html>
