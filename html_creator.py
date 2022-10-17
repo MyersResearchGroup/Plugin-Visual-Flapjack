@@ -34,6 +34,6 @@ def html_creator(signal_names: list, signal_graphs: list, all_graph: str) -> str
     partial_html = partial_html.replace('{{drop_down_options}}', drop_down_ops)
     partial_html = partial_html.replace('{{all_graph}}', all_graph)
     partial_html = partial_html.replace('{{func1_options}}', func_ops1)
-    partial_html = partial_html.replace('{{func2_options}}', func_ops2)
+    full_html = partial_html.replace('{{func2_options}}', func_ops2)
 
-    return(partial_html)
+    return(full_html)
