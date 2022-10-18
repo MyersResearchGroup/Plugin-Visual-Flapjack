@@ -40,23 +40,28 @@
 		<option value="1">All</option>{{drop_down_options}}
 	</select>
 	<p></p>
-    <div id="divText2">{{all_graph}}</div>
+    <div id="divText2">{{all_graph2}}</div>
 	</div>
   </div>
 </div>
 
 <script>
+{{start_conditions2}}
+{{start_conditions}}
+
 function changeSelect() {
     if (document.getElementById("dropBox1").value == "1") {
-        document.getElementById("divText1").innerHTML = '{{all_graph}}';
-    }{{func1_options}}
-}
+        document.getElementById('div1.overview').style.display = 'block';
+        {{start_conditions}}
+    } {{func1_options}}
+  }
 
 function changeSelect2() {
-    if (document.getElementById("dropBox2").value == "1") {
-        document.getElementById("divText2").innerHTML = '{{all_graph}}';
-    }{{func2_options}}
-}
+  if (document.getElementById("dropBox2").value == "1") {
+        document.getElementById('div2.overview').style.display = 'block';
+        {{start_conditions2}}
+    } {{func2_options}}
+  }
 </script>
 
 </body>

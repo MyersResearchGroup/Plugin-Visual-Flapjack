@@ -51,6 +51,8 @@ def run():
         fj = Flapjack(url_base=fj_url)
         fj.log_in(username=fj_user, password=fj_pass)
         fj_access_token = fj.access_token
+
+        # create graphs and put into html
         signal_names, signal_plots, all_graph = plot.create_signal_graphs(shallow_sbol, fj_access_token)
         result = hc.html_creator(signal_names, signal_plots, all_graph)
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~ END SECTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

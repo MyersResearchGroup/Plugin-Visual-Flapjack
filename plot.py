@@ -23,10 +23,12 @@ def create_signal_graphs(file_path_in, fj_access_token):
     doc.read(file_path_in)
     sample_ids = []
     for ed in doc:
-        sample_id = ed.properties['https://flapjack.rudge-lab.org/ID']
-        sample_id = str(sample_id[0]).split("/")[-1]
-        sample_ids.append(sample_id)
-
+        if 'https://flapjack.rudge-lab.org/ID' in ed.properties:
+            sample_id = ed.properties['https://flapjack.rudge-lab.org/ID']
+            sample_id = str(sample_id[0]).split("/")[-1]
+            sample_ids.append(sample_id)
+        else:
+            raise ValueError("There were no flapjack IDs associated with this experimental data object")
 
     for sample_id in sample_ids:
         # pull all of the measurements for a sample
@@ -39,6 +41,9 @@ def create_signal_graphs(file_path_in, fj_access_token):
         values = []
         signal = []
 
+        if len(measurements_list) == 0:
+            raise ValueError(f"There are no measurements associated with this sample (id:{sample_id})")
+
         # pull information into list
         for measurement in measurements_list:
             id.append(measurement["id"])
@@ -48,10 +53,10 @@ def create_signal_graphs(file_path_in, fj_access_token):
 
         # create nested dictionary
         d = {}
-        d['time'] = time
+        d['Time'] = time
         d['id'] = id
-        d['value'] = values
-        d['signal'] = signal
+        d['Value'] = values
+        d['signal_ids'] = signal
 
         # create a set of signals (list with no repeats)
         signal_set = set(signal)
@@ -64,52 +69,46 @@ def create_signal_graphs(file_path_in, fj_access_token):
         signal_names = [signal_lookup[x] for x in signal]
 
         # add signal names to the dictionary
-        d['signal_names'] = signal_names
+        d['Signals'] = signal_names
 
         # turn the dictionary into a dataframe
         df = pd.DataFrame(data=d)
 
         # calculate the max and min values
-        y_max_val = math.ceil(df['value'].max())
-        y_min_val = math.floor(df['value'].min())
-        x_max_val = math.ceil(df['time'].max())
-        x_min_val = math.floor(df['time'].min())
+        y_max_val = math.ceil(df['Value'].max())
+        y_min_val = math.floor(df['Value'].min())
+        x_max_val = math.ceil(df['Time'].max())
+        x_min_val = math.floor(df['Time'].min())
         if x_min_val >= 0:
             x_min_val = 0
         if y_min_val >= 0:
             y_min_val = 0
 
 
-        fig = px.scatter(df, x="time", y="value", color="signal_names", hover_data=[df.index], range_y=[y_min_val,y_max_val], range_x=[x_min_val, x_max_val]) #try to add a legend
-        fig.write_html(file_out_path)
+        fig = px.scatter(df, x="Time", y="Value", color="Signals", hover_data=[df.index], range_y=[y_min_val,y_max_val], range_x=[x_min_val, x_max_val]) #try to add a legend
+        fig.write_html(file_out_path, full_html=False, include_plotlyjs='cdn')
         with open(file_out_path, 'r') as f:
                 all_graph = f.read()
         # fig.show()
 
-        # px.title("sample: " + str(sample_id) + ", signal: " + str(signal_measurement[0].getSignal()))
-        # rand_hash = str(uuid.uuid4())
-        # fig_title = rand_hash + ".jpg"
-        # figTitleArr.append(fig_title)
-        # app.logger.info(fig_title)
-            #pull html from figure (plotly, the output can easily be pulled as an html) write it to some path and read in the html again
-            #create outputs as inputs for the html creator (Provide as html string, list of signal names (GFP etc), list of html of the graphs for each signal individually)
-
-        # fig_html = fig.write_html("path/to/file.html", full_html=False, include_plotlyjs='cdn')
-
         # create plot for every signal
         signal_names = []
         signal_plots = []
-        for sig in signal_set:
+        color_list = px.colors.qualitative.Plotly
+        num_colors = len(color_list)
+        for ind, sig in enumerate(signal_set):
             # filter data frame by signal
-            df_sig = df[df["signal"] == sig]
+            df_sig = df[df["signal_ids"] == sig]
             df_sig = df_sig.reset_index()
 
             # add signal names to list
-            signal_names.append(df_sig['signal_names'][0])
+            signal_names.append(df_sig['Signals'][0])
 
             # create figure html 
-            fig = px.scatter(df_sig, x="time", y="value", hover_data=[df_sig.index], range_y=[y_min_val,y_max_val], range_x=[x_min_val, x_max_val])  # try to add a legend
-            fig.write_html(file_out_path)
+            col_ind = ind % num_colors # ensures cycles through list if there are more than the number of possible colours
+            fig = px.scatter(df_sig, x="Time", y="Value", hover_data=[df_sig.index], range_y=[y_min_val,y_max_val], range_x=[x_min_val, x_max_val])
+            fig.update_traces(marker=dict(color=color_list[col_ind])) # make sure the markers match the colour from the overview plot
+            fig.write_html(file_out_path, full_html=False, include_plotlyjs='cdn')
             with open(file_out_path, 'r') as f:
                 signal_plots.append(f.read())
             # fig.show()
