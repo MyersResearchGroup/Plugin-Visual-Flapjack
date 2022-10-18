@@ -1,5 +1,5 @@
 # Plugin-Visual-Flapjack
-A very plugin to visualise measurement data associated with experimental data (flapjack samples) stored in synbiohub.
+A very plugin to visualize measurement data associated with experimental data (flapjack samples) stored in synbiohub.
 
 # Install
 ## Using docker
